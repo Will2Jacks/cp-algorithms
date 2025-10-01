@@ -84,9 +84,40 @@ Afterwards the preflow is actually a flow and we return it.
 
 ## Complexity
 
-It is easy to show, that the maximal label of a vertex is $2|V| - 1$.
-At this point all remaining excess can and will be pushed back to the source.
-This gives at most $O(V^2)$ relabel operations.
+We show that the maximum label of a vertex is $2|V|-1$.
+For any overflowing vertex \( x \), there is a simple path from \( x \) to \( s \) in the residual graph \( G_f \).
+
+Proof:
+Let \( U = \{v : \text{there is a simple path from } x \text{ to } v \text{ in } G_f \} \).
+Let \( \bar{U} = V - U \). By contradiction, assume \( s \not\in U \).
+
+We have:
+$$
+\sum_{u \in U} e(u) = \sum_{u \in U} \left( \sum_{v \in V} f(v, u) - \sum_{v \in V} f(u, v) \right)
+$$
+
+$$
+= \sum_{u \in U} \sum_{v \in V} f(v, u) - \sum_{u \in U} \sum_{v \in V} f(u, v)
+$$
+
+$$
+= \left( \sum_{u \in U} \sum_{v \in U} f(v, u) + \sum_{u \in U} \sum_{v \in \bar{U}} f(v, u) \right) - \left( \sum_{u \in U} \sum_{v \in U} f(u, v) + \sum_{u \in U} \sum_{v \in \bar{U}} f(u, v) \right)
+$$
+
+$$
+= \sum_{u \in U} \sum_{v \in \bar{U}} f(v, u) - \sum_{u \in U} \sum_{v \in \bar{U}} f(u, v)
+$$
+
+We know \( \sum_{u \in U} e(u) > 0 \), since \( e(x) > 0 \), \( x \in U \), and all vertices other than \( s \) have non-negative excess. By our assumption \( s \not\in U \), all \( u \in U \) have \( e(u) \geq 0 \). Since \( e(x) > 0 \), the sum is strictly positive.
+
+So,
+$$
+\sum_{u \in U} \sum_{v \in \bar{U}} f(v, u) - \sum_{u \in U} \sum_{v \in \bar{U}} f(u, v) > 0.
+$$
+
+This means that there exists a pair of vertices \( v' \in \bar{U} \) and \( u' \in U \) such that \( f(v', u') > 0 \). But then the residual edge \( (u', v') \) is in \( E_f \). This implies there is a simple path from \( x \rightsquigarrow u' \to v' \) in \( G_f \), which contradicts the fact that \( v' \in \bar{U} \).
+
+Therefore, the initial assumption must be false. So, \( s \in U \).
 
 It can also be showed, that there will be at most $O(V E)$ saturating pushes (a push where the total capacity of the edge is used) and at most $O(V^2 E)$ non-saturating pushes (a push where the capacity of an edge is not fully used) performed.
 If we pick a data structure that allows us to find the next vertex with excess in $O(1)$ time, then the total complexity of the algorithm is $O(V^2 E)$.
